@@ -35,12 +35,15 @@ public class FetchTask implements Runnable {
 
     @Override
     public void run() {
+        log.info("Step 1");
         if (Arrays.stream(environment.getActiveProfiles()).anyMatch(env -> (env.equalsIgnoreCase(Env.PROD) || env.equalsIgnoreCase(Env.UAT)))) {
-
+            log.info("Step 2");
             ResponseEntity<String> responseEntity = restTemplate.postForEntity(Api.SC, requestEntity, String.class);
+            log.info("Step 3");
             synchronized (this) {
                 if (Objects.nonNull(responseEntity)) {
                     String postResponse = responseEntity.getBody();
+                    log.info("postResponse: {}", postResponse);
                     if (Objects.nonNull(postResponse)) {
                         ResponseResult responseResult = null;
                         try {
@@ -63,5 +66,6 @@ public class FetchTask implements Runnable {
                 }
             }
         }
+        log.info("Step 4");
     }
 }
