@@ -1,6 +1,7 @@
 package com.ds.concurrent.fetch.task;
 
 import com.ds.concurrent.fetch.dto.post.PostResponse;
+import com.ds.concurrent.fetch.staticVariable.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
@@ -20,11 +21,11 @@ public class FetchTask implements Runnable {
 
     @Override
     public void run() {
-        ResponseEntity<PostResponse> postResponseResponseEntity = restTemplate.getForEntity("https://jsonplaceholder.typicode.com/posts/" + index, PostResponse.class);
+        ResponseEntity<PostResponse> postResponseResponseEntity = restTemplate.getForEntity(Api.POST_GET + index, PostResponse.class);
         if (Objects.nonNull(postResponseResponseEntity)) {
             PostResponse postResponse = postResponseResponseEntity.getBody();
             if (Objects.nonNull(postResponse)) {
-                log.info("ID: {}", postResponse.getId());
+                log.info("postResponse: {}", postResponse);
             }
         }
     }
