@@ -3,6 +3,7 @@ package com.ds.concurrent.fetch.serviceImpl;
 import com.ds.concurrent.fetch.callback.PostResCallback;
 import com.ds.concurrent.fetch.dto.common.CommonResponse;
 import com.ds.concurrent.fetch.service.TestService;
+import com.ds.concurrent.fetch.staticVariable.AppMessage;
 import com.ds.concurrent.fetch.task.FetchTask;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +34,7 @@ public class TestServiceImpl implements TestService {
         PostResCallback postResCallback = (index, postResponse) -> {
             totalRes.getAndIncrement();
             if (totalReq.get() == totalRes.get()) {
-                log.info("Total Complete: {}", totalRes.get());
+                log.info("Total Process Complete: {}", totalRes.get());
             }
         };
         for (int i = 0; i < 10; i++) {
@@ -45,6 +46,6 @@ public class TestServiceImpl implements TestService {
         executorService.shutdown();
         todo.clear();
         answers.clear();
-        return new CommonResponse("Fetch Start Successfully!");
+        return new CommonResponse(AppMessage.FETCH_START);
     }
 }
