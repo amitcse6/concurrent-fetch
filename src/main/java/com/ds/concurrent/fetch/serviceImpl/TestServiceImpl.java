@@ -27,25 +27,30 @@ public class TestServiceImpl implements TestService {
 
     @Override
     public CommonResponse fetch() throws InterruptedException {
-        ExecutorService executorService = Executors.newFixedThreadPool(10);
-        List<Callable<Object>> todo = new ArrayList<>();
-        AtomicInteger totalReq = new AtomicInteger(0);
-        AtomicInteger totalRes = new AtomicInteger(0);
-        PostResCallback postResCallback = (index, postResponse) -> {
-            totalRes.getAndIncrement();
-            if (totalReq.get() == totalRes.get()) {
-                log.info("Total Process Complete: {}", totalRes.get());
+        int totalProcess = 3;
+        int totalStep = 100;
+        for (int p = 0; p < totalProcess; p++) {
+            ExecutorService executorService = Executors.newFixedThreadPool(totalStep);
+            List<Callable<Object>> todo = new ArrayList<>();
+            AtomicInteger totalReq = new AtomicInteger(0);
+            AtomicInteger totalRes = new AtomicInteger(0);
+            PostResCallback postResCallback = (index, postResponse) -> {
+                totalRes.getAndIncrement();
+                if (totalRes.get() == totalStep) {
+                    log.info("Total Step Complete: {}", totalRes.get());
+                }
+            };
+            for (int i = 0; i < totalStep; i++) {
+                FetchTask fetchTask = new FetchTask(i, restTemplate, postResCallback);
+                todo.add(Executors.callable(fetchTask));
+                totalReq.incrementAndGet();
             }
-        };
-        for (int i = 0; i < 10; i++) {
-            FetchTask fetchTask = new FetchTask(i, restTemplate, postResCallback);
-            todo.add(Executors.callable(fetchTask));
-            totalReq.incrementAndGet();
+            List<Future<Object>> answers = executorService.invokeAll(todo);
+            executorService.shutdown();
+            todo.clear();
+            answers.clear();
+            log.info("{}/{} Complete.", (p + 1), totalProcess);
         }
-        List<Future<Object>> answers = executorService.invokeAll(todo);
-        executorService.shutdown();
-        todo.clear();
-        answers.clear();
         return new CommonResponse(AppMessage.FETCH_START);
     }
 }
