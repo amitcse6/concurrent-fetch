@@ -51,6 +51,7 @@ public class TestServiceImpl implements TestService {
             answers.clear();
             log.info("{}/{} Complete.", (p + 1), totalProcess);
         }
+        log.info(AppMessage.FETCH_COMPLETE);
         return new CommonResponse(AppMessage.FETCH_START);
     }
 }
